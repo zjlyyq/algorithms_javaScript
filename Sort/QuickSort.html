@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>快排动画演示</title>
+    <style>
+        .cell {
+            width: 50px;
+            height: 50px;
+            background-color: gray;
+            display: inline-block;
+            line-height: 50px;
+            text-align: center;
+            color: white;
+        }
+
+        #info {
+            background: blanchedalmond;
+            height: 100px;
+            line-height: 100px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+    </div> <br>
+    <div id="info">
+        nothing
+    </div>
+    <button>quick sort</button>
+    <script>
+        let cells = document.querySelectorAll('.cell');
+        let infoDom = document.querySelector('#info')
+        let reactive = function (obj) {
+            let observed = new Proxy(obj, {
+                get: function (data, prop) {
+                    return data[prop];
+                },
+                set: function (data, prop, value) {
+                    data[prop] = value;
+                    show();
+                }
+            })
+            return observed;
+        }
+
+        function show() {
+            for (let i = 0; i < data.length; i++) {
+                cells[i].innerText = data[i];
+            }
+        }
+        let data = [6, 10, 4, 5, 3, 7, 2, 1, 9, 8];
+        data = reactive(data);
+        console.log(data)
+        show(data, 0);
+    </script>
+    <script>
+        let sleep = (t) => {
+            return new Promise((resolve, reject) => {
+                setTimeout(resolve, t);
+            })
+        }
+
+        let partition = async function (data, l, r) {
+            for (let k = l; k <= r; k++) {
+                cells[k].style['border-radius'] = "50%";
+            }
+            cells[l].innerText = "❌"
+            let i = l, j = r, value = data[l];
+            cells[i].style.background = "red";
+            cells[j].style.background = "green";
+            while (i < j) {
+                while (i < j && data[j] > value) {
+                    infoDom.innerText = `baseValue = ${value} ,compare position ${j} with baseValue`;
+                    await sleep(2000)
+                    j--;
+                    cells[j + 1].style.background = "gray";
+                    cells[j].style.background = "green";
+                }
+                await sleep(2000)
+                infoDom.innerText = `position ${j} is should bigger than baseValue but ...`;
+                if (i < j) {
+                    // await sleep(2000)
+                    data[i++] = data[j]; // 此时后半部分有个空位
+                    cells[j].innerText = "❌"
+                    cells[i - 1].style.background = "gray";
+                    cells[i].style.background = "red";
+                }
+                while (i < j && data[i] < value) {
+                    infoDom.innerText = `baseValue = ${value} ,compare position ${i} with baseValue`;
+                    await sleep(2000)
+                    i++;
+                    cells[i - 1].style.background = "gray";
+                    cells[i].style.background = "red";
+                }
+                await sleep(2000)
+                infoDom.innerText = `position ${i} is should smaller than baseValue but ...`;
+                if (i < j) {
+                    // await sleep(2000)
+                    data[j--] = data[i];  // 此时后前部分有个空位
+                    cells[i].innerText = "❌"
+                    cells[j + 1].style.background = "gray";
+                    cells[j].style.background = "green";
+                }
+            }
+            data[i] = value;
+            for (let k = l; k <= r; k++) {
+                cells[k].style.background = "gray";
+                cells[k].style['border-radius'] = "";
+            }
+            return i;
+        }
+
+        let quickSort = async function (data, l, r) {
+            if (l >= r) return;
+            let pos = await partition(data, l, r);
+            await quickSort(data, l, pos - 1);
+            await quickSort(data, pos + 1, r);
+        }
+    </script>
+    <script>
+        async function go() {
+            await quickSort(data, 0, data.length - 1);
+            console.log(data)
+            show(data, 0);
+        }
+        go()
+    </script>
+</body>
+
+</html>
