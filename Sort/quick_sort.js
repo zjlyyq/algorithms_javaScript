@@ -20,5 +20,4 @@ async function go () {
     await quickSort(data, 0, data.length-1);
     console.log(data);
 }
-
 go();
